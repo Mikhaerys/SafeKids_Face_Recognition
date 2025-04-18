@@ -1,0 +1,232 @@
+/* General Styles */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* App Container */
+.App {
+  text-align: center;
+  padding: 20px;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+/* App Header */
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  margin-bottom: 30px;
+  border-radius: 8px;
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 2em;
+}
+
+/* Navigation */
+nav {
+  margin-bottom: 20px;
+}
+
+nav a {
+  margin: 0 15px;
+  color: #61dafb;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav a:hover,
+nav a.active {
+  text-decoration: underline;
+}
+
+/* Main Content Area */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Component Sections */
+h2,
+h3,
+h4 {
+  color: #282c34;
+}
+
+/* Buttons */
+button {
+  background-color: #61dafb;
+  border: none;
+  color: #282c34;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 10px 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #21a1f1;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Input Fields & Select */
+input[type="text"],
+input[type="file"],
+select {
+  width: calc(100% - 22px);
+  /* Account for padding and border */
+  padding: 10px;
+  margin: 10px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  text-align: left;
+}
+
+/* Webcam and Image Display */
+.verification-container,
+.registration-container {
+  /* Add class to component divs if needed */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.webcam-capture-section {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  /* Allow wrapping on smaller screens */
+  justify-content: center;
+}
+
+.webcam-capture-section>div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+img {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  margin-top: 10px;
+  max-width: 100%;
+  /* Ensure images don't overflow */
+  height: auto;
+}
+
+/* Results and Errors */
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.success-message {
+  color: green;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.verification-result,
+.registration-result {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  text-align: left;
+  width: 80%;
+  max-width: 600px;
+}
+
+.verification-result ul {
+  list-style: none;
+  padding: 0;
+}
+
+.verification-result li {
+  background-color: #e9e9e9;
+  margin: 5px 0;
+  padding: 8px;
+  border-radius: 3px;
+}
+
+/* Student Selection */
+.student-selection {
+  text-align: left;
+  margin-top: 15px;
+  width: 100%;
+  max-width: 400px;
+  /* Adjust as needed */
+}
+
+.student-selection label {
+  margin-bottom: 5px;
+}
+
+.student-selection div {
+  margin-bottom: 5px;
+}
+
+.student-selection input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Keyframes */
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
