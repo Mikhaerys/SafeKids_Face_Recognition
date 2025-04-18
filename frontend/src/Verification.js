@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import Webcam from 'react-webcam';
 import axios from 'axios';
+import config from './config';
 
 const Verification = () => {
     const webcamRef = useRef(null);
@@ -9,11 +10,8 @@ const Verification = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const videoConstraints = {
-        width: 480,
-        height: 480,
-        facingMode: "user" // or "environment" for rear camera
-    };
+    // Use videoConstraints from config
+    const videoConstraints = config.imageSettings.webcam;
 
     // Function to convert base64 image to Blob
     const dataURLtoBlob = (dataurl) => {
@@ -21,7 +19,7 @@ const Verification = () => {
         try {
             const arr = dataurl.split(',');
             if (arr.length < 2) return null;
-            const mimeMatch = arr[0].match(/:(.*?);/); // Fixed regex: removed space after colon
+            const mimeMatch = arr[0].match(/:(.*?);/);
             if (!mimeMatch || mimeMatch.length < 2) return null;
             const mime = mimeMatch[1];
             const bstr = atob(arr[1]);
@@ -47,7 +45,7 @@ const Verification = () => {
             setError("Could not capture image from webcam.");
             setImgSrc(null);
         }
-    }, [webcamRef, setImgSrc, setVerificationResult, setError]);
+    }, [webcamRef]);
 
     const handleVerify = async () => {
         if (!imgSrc) {
@@ -62,7 +60,6 @@ const Verification = () => {
         }
 
         const formData = new FormData();
-        // The backend will generate a unique filename using timestamps
         formData.append('image', imageBlob, 'capture.jpg');
 
         setLoading(true);
@@ -70,35 +67,30 @@ const Verification = () => {
         setVerificationResult(null);
 
         try {
-            // Assuming backend runs on http://127.0.0.1:5000
-            // Adjust if your Flask server runs elsewhere
-            const response = await axios.post('http://127.0.0.1:5000/verify_pickup', formData, {
+            // Use API URL from config
+            const response = await axios.post(`${config.api.baseUrl}/verify_pickup`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
             setVerificationResult(response.data);
-            console.log("Verification response:", response.data);
         } catch (err) {
             console.error("Verification API error:", err);
             if (err.response) {
-                // Error from backend (e.g., no match, no face detected)
                 setError(err.response.data.error || `Verification failed: ${err.response.statusText}`);
             } else if (err.request) {
-                // Network error
                 setError("Verification failed: Could not connect to the server.");
             } else {
-                // Other errors
                 setError(`Verification failed: ${err.message}`);
             }
-            setVerificationResult(null); // Clear result on error
+            setVerificationResult(null);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div>
+        <div className="verification-container">
             <h2>Guardian Verification</h2>
             <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
                 <div>
@@ -123,10 +115,10 @@ const Verification = () => {
                 )}
             </div>
 
-            {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+            {error && <p className="error-message">Error: {error}</p>}
 
             {verificationResult && (
-                <div>
+                <div className="verification-result">
                     <h3>Verification Result:</h3>
                     {verificationResult.match ? (
                         <div>

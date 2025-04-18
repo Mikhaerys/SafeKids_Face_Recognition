@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import axios from 'axios';
+import config from './config';
 
 const Registration = () => {
     const webcamRef = useRef(null);
@@ -14,18 +15,13 @@ const Registration = () => {
     const [loading, setLoading] = useState(false);
     const [useWebcam, setUseWebcam] = useState(true); // Toggle between webcam and file upload
 
-    const videoConstraints = {
-        width: 480,
-        height: 480,
-        facingMode: "user"
-    };
+    const videoConstraints = config.imageSettings.webcam;
 
     // Fetch students on component mount
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                // Adjust API endpoint if needed
-                const response = await axios.get('http://127.0.0.1:5000/students');
+                const response = await axios.get(`${config.api.baseUrl}/students`);
                 setStudents(response.data || []);
             } catch (err) {
                 console.error("Error fetching students:", err);
@@ -146,8 +142,7 @@ const Registration = () => {
         setRegistrationResult(null);
 
         try {
-            // Adjust API endpoint if needed
-            const response = await axios.post('http://127.0.0.1:5000/register_guardian', formData, {
+            const response = await axios.post(`${config.api.baseUrl}/register_guardian`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

@@ -5,6 +5,7 @@ import os
 import time  # Import time for timestamp generation
 from werkzeug.utils import secure_filename
 from flask import current_app
+from pathlib import Path
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -25,50 +26,46 @@ def save_uploaded_file(file, folder_type):
     Returns:
         tuple: (relative_path_for_db, full_path_on_disk) or (None, None) if failed.
     """
-    if file and allowed_file(file.filename):
-        # Get original filename and make it secure
-        orig_filename = secure_filename(file.filename)
+    if not file or not allowed_file(file.filename or ''):
+        current_app.logger.warning(
+            f"File not saved. Invalid file or not allowed type: {getattr(file, 'filename', None)}")
+        return None, None
 
-        # Get file extension
-        name, ext = os.path.splitext(orig_filename)
+    # Get original filename and make it secure
+    orig_filename = secure_filename(file.filename)
+    name, ext = os.path.splitext(orig_filename)
 
-        # Create unique filename with timestamp to prevent collisions
-        timestamp = int(time.time())
-        unique_filename = f"{name}_{timestamp}{ext}"
+    # Create unique filename with timestamp to prevent collisions
+    timestamp = int(time.time())
+    unique_filename = f"{name}_{timestamp}{ext}"
 
-        if folder_type == 'reference':
-            folder_path = current_app.config['REFERENCE_FOLDER']
-        elif folder_type == 'verified':
-            folder_path = current_app.config['VERIFIED_FOLDER']
-        else:
-            current_app.logger.error(
-                f"Invalid folder_type specified: {folder_type}")
-            raise ValueError("Invalid folder_type specified")
+    # Determine appropriate folder
+    if folder_type == 'reference':
+        folder_path = current_app.config['REFERENCE_FOLDER']
+    elif folder_type == 'verified':
+        folder_path = current_app.config['VERIFIED_FOLDER']
+    else:
+        current_app.logger.error(
+            f"Invalid folder_type specified: {folder_type}")
+        raise ValueError("Invalid folder_type specified")
 
-        # Ensure the specific folder exists (Config should create the base)
-        os.makedirs(folder_path, exist_ok=True)
+    # Ensure the folder exists (should be created by config, but double-check)
+    Path(folder_path).mkdir(parents=True, exist_ok=True)
 
-        file_path = os.path.join(folder_path, unique_filename)
+    file_path = os.path.join(folder_path, unique_filename)
+    current_app.logger.info(
+        f"Generated unique filename: {unique_filename} from original: {orig_filename}")
 
-        # No need to check for existence since we're using a timestamp in the filename
-        # but log the filename generation for traceability
-        current_app.logger.info(
-            f"Generated unique filename: {unique_filename} from original: {orig_filename}")
-
-        try:
-            file.save(file_path)
-            # Return the path relative to the base UPLOAD_FOLDER for storing in DB
-            relative_path = os.path.join(folder_type, unique_filename)
-            current_app.logger.info(f"Saved file to: {file_path}")
-            return relative_path, file_path  # Return relative for DB, full for processing
-        except Exception as e:
-            current_app.logger.error(
-                f"Failed to save file {unique_filename} to {folder_path}: {e}")
-            return None, None
-
-    current_app.logger.warning(
-        f"File not saved. Allowed: {allowed_file(file.filename) if file.filename else False}, File provided: {bool(file)}")
-    return None, None
+    try:
+        file.save(file_path)
+        # Return the path relative to the base UPLOAD_FOLDER for storing in DB
+        relative_path = os.path.join(folder_type, unique_filename)
+        current_app.logger.info(f"Saved file to: {file_path}")
+        return relative_path, file_path  # Return relative for DB, full for processing
+    except Exception as e:
+        current_app.logger.error(
+            f"Failed to save file {unique_filename} to {folder_path}: {e}")
+        return None, None
 
 
 def get_face_encoding(image_path):
@@ -76,8 +73,11 @@ def get_face_encoding(image_path):
     try:
         current_app.logger.debug(f"Loading image for encoding: {image_path}")
         image = face_recognition.load_image_file(image_path)
-        # model can be 'cnn' for more accuracy but slower, default is 'hog'
-        encodings = face_recognition.face_encodings(image, model='hog')
+
+        # Use model from config - either 'hog' (faster) or 'cnn' (more accurate)
+        model = current_app.config.get('FACE_RECOGNITION_MODEL', 'hog')
+        encodings = face_recognition.face_encodings(image, model=model)
+
         if encodings:
             current_app.logger.info(f"Found face encoding in: {image_path}")
             return encodings[0]  # Return the first encoding found
@@ -92,18 +92,22 @@ def get_face_encoding(image_path):
         return None
 
 
-def compare_faces(known_encodings, unknown_encoding, tolerance=0.6):
+def compare_faces(known_encodings, unknown_encoding, tolerance=None):
     """Compares an unknown encoding against a list of known encodings.
 
     Args:
         known_encodings (list): A list of known face encodings (numpy arrays).
         unknown_encoding (numpy.ndarray): The encoding of the face to check.
-        tolerance (float): How much distance between faces to consider it a match.
-                         Lower is stricter. 0.6 is typical.
+        tolerance (float, optional): How much distance between faces to consider it a match.
+                         Lower is stricter. Defaults to config value or 0.6.
 
     Returns:
         list: A list of booleans indicating matches for each known encoding.
     """
+    # If no tolerance provided, use the value from config
+    if tolerance is None:
+        tolerance = current_app.config.get('FACE_RECOGNITION_TOLERANCE', 0.6)
+
     if unknown_encoding is None or not known_encodings:
         current_app.logger.debug(
             "Compare faces: No unknown encoding or no known encodings provided.")
@@ -126,7 +130,7 @@ def compare_faces(known_encodings, unknown_encoding, tolerance=0.6):
             return []
 
         current_app.logger.info(
-            f"Comparing unknown face against {len(valid_known_encodings)} known faces.")
+            f"Comparing unknown face against {len(valid_known_encodings)} known faces (tolerance: {tolerance}).")
         matches = face_recognition.compare_faces(
             valid_known_encodings, unknown_encoding, tolerance=tolerance)
         return matches

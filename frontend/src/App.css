@@ -1,20 +1,3 @@
-/* General Styles */
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f4f4f4;
-  color: #333;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
 /* App Container */
 .App {
   text-align: center;
@@ -108,9 +91,9 @@ button:disabled {
 /* Input Fields & Select */
 input[type="text"],
 input[type="file"],
+input[type="email"],
 select {
   width: calc(100% - 22px);
-  /* Account for padding and border */
   padding: 10px;
   margin: 10px 0;
   display: inline-block;
@@ -129,8 +112,8 @@ label {
 
 /* Webcam and Image Display */
 .verification-container,
-.registration-container {
-  /* Add class to component divs if needed */
+.registration-container,
+.add-student-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -142,7 +125,6 @@ label {
   gap: 20px;
   align-items: flex-start;
   flex-wrap: wrap;
-  /* Allow wrapping on smaller screens */
   justify-content: center;
 }
 
@@ -158,7 +140,6 @@ img {
   padding: 5px;
   margin-top: 10px;
   max-width: 100%;
-  /* Ensure images don't overflow */
   height: auto;
 }
 
@@ -205,7 +186,6 @@ img {
   margin-top: 15px;
   width: 100%;
   max-width: 400px;
-  /* Adjust as needed */
 }
 
 .student-selection label {

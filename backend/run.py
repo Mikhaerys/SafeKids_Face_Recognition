@@ -1,10 +1,10 @@
 from app import create_app, db
-from app.models import Guardian, Student, PickupLog  # Import models
+from app.models import Guardian, Student, PickupLog
+import os
 
 app = create_app()
 
-# Optional: Create shell context for 'flask shell' command
-# Makes db and models available in the shell without importing
+# Create shell context for 'flask shell' command
 
 
 @app.shell_context_processor
@@ -13,6 +13,10 @@ def make_shell_context():
 
 
 if __name__ == "__main__":
-    # Note: 'flask run' command uses FLASK_ENV=development from .flaskenv
-    # This __main__ block is for direct execution 'python run.py' (less common with Flask CLI)
-    app.run(debug=True)
+    # Get debug mode from environment or default to False for safety
+    debug_mode = os.environ.get('FLASK_DEBUG', '0').lower() in (
+        '1', 'true', 't', 'yes', 'y')
+    # Get port from environment or default to 5000
+    port = int(os.environ.get('FLASK_PORT', 5000))
+
+    app.run(debug=debug_mode, host='0.0.0.0', port=port)

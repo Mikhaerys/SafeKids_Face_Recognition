@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import config from './config';
 
 const AddStudent = () => {
     const [studentName, setStudentName] = useState('');
-    const [teacherEmail, setTeacherEmail] = useState(''); // Optional
+    const [teacherEmail, setTeacherEmail] = useState('');
     const [result, setResult] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleAddStudent = async (e) => {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault();
         if (!studentName.trim()) {
             setError("Student name cannot be empty.");
             return;
@@ -25,14 +26,12 @@ const AddStudent = () => {
         };
 
         try {
-            // Adjust API endpoint if needed
-            const response = await axios.post('http://127.0.0.1:5000/add_student', studentData, {
+            const response = await axios.post(`${config.api.baseUrl}/add_student`, studentData, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
             setResult(response.data);
-            console.log("Add student response:", response.data);
             // Clear form on success
             setStudentName('');
             setTeacherEmail('');
@@ -52,7 +51,7 @@ const AddStudent = () => {
     };
 
     return (
-        <div className="add-student-container"> {/* Optional: Add class for styling */}
+        <div className="add-student-container">
             <h2>Add New Student</h2>
             <form onSubmit={handleAddStudent}>
                 <div>
@@ -70,7 +69,7 @@ const AddStudent = () => {
                 <div>
                     <label htmlFor="teacherEmail">Teacher's Email (Optional):</label>
                     <input
-                        type="email" // Use type email for basic validation
+                        type="email"
                         id="teacherEmail"
                         value={teacherEmail}
                         onChange={(e) => setTeacherEmail(e.target.value)}
