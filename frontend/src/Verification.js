@@ -92,22 +92,20 @@ const Verification = () => {
     return (
         <div className="verification-container">
             <h2>Guardian Verification</h2>
-            <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-                <div>
+            <div className="webcam-capture-section">
+                <div className="webcam-container">
                     <Webcam
                         audio={false}
                         ref={webcamRef}
                         screenshotFormat="image/jpeg"
-                        width={videoConstraints.width}
-                        height={videoConstraints.height}
                         videoConstraints={videoConstraints}
                     />
                     <button onClick={capture} disabled={loading}>Capture Photo</button>
                 </div>
                 {imgSrc && (
-                    <div>
+                    <div className="preview-container">
                         <h3>Captured Image:</h3>
-                        <img src={imgSrc} alt="Captured guardian" width={videoConstraints.width / 2} />
+                        <img src={imgSrc} alt="Captured guardian" />
                         <button onClick={handleVerify} disabled={loading}>
                             {loading ? 'Verifying...' : 'Verify Identity'}
                         </button>

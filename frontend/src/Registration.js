@@ -173,14 +173,26 @@ const Registration = () => {
         <div className="registration-container">
             <h2>Register New Guardian</h2>
 
-            <div style={{ marginBottom: '20px' }}>
-                <button onClick={() => setUseWebcam(true)} disabled={useWebcam || loading}>Use Webcam</button>
-                <button onClick={() => setUseWebcam(false)} disabled={!useWebcam || loading}>Upload File</button>
+            <div className="input-toggle-container">
+                <button
+                    onClick={() => setUseWebcam(true)}
+                    disabled={useWebcam || loading}
+                    className={useWebcam ? 'active' : ''}
+                >
+                    Use Webcam
+                </button>
+                <button
+                    onClick={() => setUseWebcam(false)}
+                    disabled={!useWebcam || loading}
+                    className={!useWebcam ? 'active' : ''}
+                >
+                    Upload File
+                </button>
             </div>
 
             <div className="webcam-capture-section">
                 {useWebcam ? (
-                    <div>
+                    <div className="webcam-container">
                         <Webcam
                             audio={false}
                             ref={webcamRef}
@@ -192,7 +204,7 @@ const Registration = () => {
                         <button onClick={capture} disabled={loading}>Capture Photo</button>
                     </div>
                 ) : (
-                    <div>
+                    <div className="file-input-container">
                         <label htmlFor="file-upload">Upload Reference Image:</label>
                         <input
                             id="file-upload"
@@ -206,7 +218,7 @@ const Registration = () => {
                 )}
 
                 {imgSrc && (
-                    <div>
+                    <div className="preview-container">
                         <h3>Preview:</h3>
                         <img src={imgSrc} alt="Guardian preview" width={videoConstraints.width / 2} />
                     </div>
@@ -214,8 +226,8 @@ const Registration = () => {
             </div>
 
             {imgSrc && ( // Only show form fields after image is ready
-                <>
-                    <div>
+                <div className="registration-form">
+                    <div className="form-group">
                         <label htmlFor="guardianName">Guardian Name:</label>
                         <input
                             type="text"
@@ -231,7 +243,7 @@ const Registration = () => {
                         <label>Select Authorized Students:</label>
                         {students.length > 0 ? (
                             students.map(student => (
-                                <div key={student.id}>
+                                <div key={student.id} className="student-checkbox">
                                     <input
                                         type="checkbox"
                                         id={`student-${student.id}`}
@@ -240,7 +252,7 @@ const Registration = () => {
                                         disabled={loading}
                                     />
                                     {/* Use label associated with checkbox for better accessibility */}
-                                    <label htmlFor={`student-${student.id}`} style={{ display: 'inline', marginLeft: '5px', fontWeight: 'normal' }}>
+                                    <label htmlFor={`student-${student.id}`} className="student-label">
                                         {student.name} (ID: {student.id})
                                     </label>
                                 </div>
@@ -250,10 +262,14 @@ const Registration = () => {
                         )}
                     </div>
 
-                    <button onClick={handleRegister} disabled={loading || !guardianName.trim() || selectedStudents.size === 0 || !imgSrc}>
+                    <button
+                        onClick={handleRegister}
+                        disabled={loading || !guardianName.trim() || selectedStudents.size === 0 || !imgSrc}
+                        className="register-button"
+                    >
                         {loading ? 'Registering...' : 'Register Guardian'}
                     </button>
-                </>
+                </div>
             )}
 
             {error && <p className="error-message">Error: {error}</p>}

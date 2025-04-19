@@ -54,6 +54,8 @@ main {
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-x: hidden;
+  /* Prevent horizontal scroll */
 }
 
 /* Component Sections */
@@ -118,20 +120,42 @@ label {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .webcam-capture-section {
   display: flex;
+  flex-direction: row;
   gap: 20px;
   align-items: flex-start;
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
 }
 
-.webcam-capture-section>div {
+.webcam-container {
+  width: 100%;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.preview-container {
+  width: 100%;
+  max-width: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Make webcam and images responsive */
+.webcam-container video,
+.webcam-container canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
 }
 
 img {
@@ -164,8 +188,9 @@ img {
   border-radius: 5px;
   background-color: #f9f9f9;
   text-align: left;
-  width: 80%;
+  width: 100%;
   max-width: 600px;
+  box-sizing: border-box;
 }
 
 .verification-result ul {
@@ -208,5 +233,46 @@ img {
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Mobile-first responsive design */
+@media screen and (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+
+  .App-header {
+    padding: 15px;
+  }
+
+  .App-header h1 {
+    font-size: 1.5em;
+  }
+
+  main {
+    padding: 15px;
+  }
+
+  nav a {
+    margin: 0 10px;
+    font-size: 14px;
+  }
+
+  .webcam-capture-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .webcam-container,
+  .preview-container {
+    max-width: 100%;
+  }
+
+  button {
+    width: 100%;
+    max-width: 240px;
+    margin: 8px auto;
+    display: block;
   }
 }
