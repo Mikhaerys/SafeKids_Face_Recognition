@@ -6,6 +6,22 @@ import os
 from datetime import datetime
 
 
+@current_app.route('/', methods=['GET'])
+def index():
+    """Root endpoint to check if the API is working."""
+    return jsonify({
+        "status": "online",
+        "message": "FR Safe Kids API is running",
+        "endpoints": [
+            "/register_guardian",
+            "/verify_pickup",
+            "/add_student",
+            "/students",
+            "/guardians"
+        ]
+    })
+
+
 @current_app.route('/register_guardian', methods=['POST'])
 def register_guardian():
     """Register a new guardian with their reference image and associated students."""

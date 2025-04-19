@@ -39,7 +39,19 @@ def create_app(config_class=Config):
 
     # Configure CORS with settings from config
     cors_origins = app.config.get('CORS_ORIGINS', '*')
-    CORS(app, resources={r"/*": {"origins": cors_origins}})
+    # Handle comma-separated list of origins
+    if isinstance(cors_origins, str) and cors_origins != '*':
+        cors_origins = [origin.strip() for origin in cors_origins.split(',')]
+        # Special handling for patterns with wildcards (like 192.168.0.*)
+        import re
+        for i, origin in enumerate(cors_origins[:]):
+            if '*' in origin:
+                # Convert wildcard pattern to regex pattern
+                pattern = origin.replace('.', '\\.').replace('*', '.*')
+                cors_origins[i] = re.compile(pattern)
+
+    CORS(app, resources={r"/*": {"origins": cors_origins}},
+         supports_credentials=True)
     app.logger.info(f"CORS enabled with origins: {cors_origins}")
 
     # Import and register routes (or blueprints)
