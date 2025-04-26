@@ -11,8 +11,10 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(24)
 
     # SQLite database path
+    # Construct the path relative to the 'backend' directory, then into 'instance'
+    instance_path = os.path.join(basedir, 'instance')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
+        'sqlite:///' + os.path.join(instance_path, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # CORS settings - restrict in production
@@ -29,5 +31,7 @@ class Config:
     os.makedirs(VERIFIED_FOLDER, exist_ok=True)
 
     # Face recognition settings
-    FACE_RECOGNITION_TOLERANCE = 0.6  # Lower is stricter
-    FACE_RECOGNITION_MODEL = 'hog'    # 'hog' (faster) or 'cnn' (more accurate)
+    FACE_RECOGNITION_TOLERANCE = float(os.environ.get(
+        'FACE_RECOGNITION_TOLERANCE', 0.6))  # Lower is stricter
+    # 'hog' (faster) or 'cnn' (more accurate)
+    FACE_RECOGNITION_MODEL = os.environ.get('FACE_RECOGNITION_MODEL', 'hog')
