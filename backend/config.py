@@ -10,12 +10,9 @@ class Config:
     # Secret key - strong recommend to set in environment variable for production
     SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(24)
 
-    # SQLite database path
-    # Construct the path relative to the 'backend' directory, then into 'instance'
-    instance_path = os.path.join(basedir, 'instance')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(instance_path, 'app.db')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Firebase settings
+    FIREBASE_DATABASE_URL = os.environ.get('FIREBASE_DATABASE_URL')
+    FIREBASE_CREDENTIALS_PATH = os.environ.get('FIREBASE_CREDENTIALS_PATH')
 
     # CORS settings - restrict in production
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*')

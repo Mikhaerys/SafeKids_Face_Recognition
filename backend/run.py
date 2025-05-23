@@ -1,4 +1,4 @@
-from app import create_app, db
+from app import create_app, firestore_db
 from app.models import Guardian, Student, PickupLog
 import os
 
@@ -9,7 +9,7 @@ app = create_app()
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'Guardian': Guardian, 'Student': Student, 'PickupLog': PickupLog}
+    return {'firestore_db': firestore_db, 'Guardian': Guardian, 'Student': Student, 'PickupLog': PickupLog}
 
 
 if __name__ == "__main__":

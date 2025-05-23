@@ -1,14 +1,17 @@
 from flask import Flask
 from config import Config
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+# from flask_sqlalchemy import SQLAlchemy # Removed
+# from flask_migrate import Migrate # Removed
 from flask_cors import CORS
 import os
 import logging
+import firebase_admin
+from firebase_admin import credentials, firestore
 
 # Initialize extensions
-db = SQLAlchemy()
-migrate = Migrate()
+# db = SQLAlchemy() # Removed
+# migrate = Migrate() # Removed
+firestore_db = None  # Firebase client
 
 
 def create_app(config_class=Config):
@@ -27,15 +30,49 @@ def create_app(config_class=Config):
         app.logger.setLevel(logging.DEBUG)
         app.logger.info('FR Safe Kids startup')
 
-    # Ensure instance folder exists (needed for SQLite DB file)
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass  # Already exists
+    # Ensure instance folder exists (needed for SQLite DB file) # Removed
+    # try: # Removed
+    #     os.makedirs(app.instance_path) # Removed
+    # except OSError: # Removed
+    #     pass  # Already exists # Removed
 
-    # Initialize Flask extensions with the app
-    db.init_app(app)
-    migrate.init_app(app, db)
+    # Initialize Firebase Admin SDK
+    global firestore_db
+    if not firebase_admin._apps:  # Check if already initialized
+        try:
+            cred_path = app.config.get('FIREBASE_CREDENTIALS_PATH')
+            # db_url = app.config.get('FIREBASE_DATABASE_URL') # Removed
+
+            if not cred_path:
+                app.logger.error(
+                    "FIREBASE_CREDENTIALS_PATH not set in config.")
+                raise ValueError("Firebase credentials path not set.")
+            # if not db_url: # Removed
+            #     app.logger.error("FIREBASE_DATABASE_URL not set in config.") # Removed
+            #     raise ValueError("Firebase database URL not set.") # Removed
+
+            cred = credentials.Certificate(cred_path)
+            firebase_admin.initialize_app(cred)  # Removed databaseURL option
+            firestore_db = firestore.client()
+            app.logger.info(
+                "Firebase Admin SDK initialized successfully for Cloud Firestore.")
+        except Exception as e:
+            app.logger.error(
+                f"Failed to initialize Firebase Admin SDK: {e}", exc_info=True)
+            # Depending on the app's requirements, you might want to raise the exception
+            # or handle it gracefully (e.g., run in a limited mode or exit).
+            raise RuntimeError(f"Firebase initialization failed: {e}") from e
+    else:
+        # If already initialized (e.g., in a test setup or multiple create_app calls),
+        # ensure firestore_db is set for the current context if needed,
+        # though typically initialize_app is called once.
+        if firestore_db is None:
+            firestore_db = firestore.client()
+        app.logger.info("Firebase Admin SDK already initialized.")
+
+    # Initialize Flask extensions with the app # Removed
+    # db.init_app(app) # Removed
+    # migrate.init_app(app, db) # Removed
 
     # Configure CORS with settings from config
     cors_origins = app.config.get('CORS_ORIGINS', '*')
@@ -57,7 +94,7 @@ def create_app(config_class=Config):
     # Import and register routes (or blueprints)
     with app.app_context():  # Need app context for routes using current_app
         from . import routes
-        # Import models here to ensure they are known to Flask-Migrate
-        from app import models
+        # Import models here to ensure they are known to Flask-Migrate # Models will be different
+        from app import models  # Models will be refactored for Firebase
 
     return app

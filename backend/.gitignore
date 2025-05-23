@@ -186,3 +186,5 @@ cython_debug/
 
 # User uploaded files
 uploads/
+
+*.json
