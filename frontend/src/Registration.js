@@ -14,6 +14,7 @@ const Registration = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [useWebcam, setUseWebcam] = useState(true); // Toggle between webcam and file upload
+    const [studentSearchTerm, setStudentSearchTerm] = useState(''); // Added for student search
 
     const videoConstraints = config.imageSettings.webcam;
 
@@ -169,6 +170,15 @@ const Registration = () => {
         }
     };
 
+    // Calculate filteredStudents
+    const lcSearchTerm = studentSearchTerm.toLowerCase();
+    const currentFilteredStudents = (studentSearchTerm && students.length > 0)
+        ? students.filter(student =>
+            (student.name && student.name.toLowerCase().includes(lcSearchTerm)) ||
+            (student.id && student.id.toString().toLowerCase().includes(lcSearchTerm))
+        )
+        : [];
+
     return (
         <div className="registration-container">
             <h2>Register New Guardian</h2>
@@ -240,25 +250,48 @@ const Registration = () => {
                     </div>
 
                     <div className="student-selection">
-                        <label>Select Authorized Students:</label>
-                        {students.length > 0 ? (
-                            students.map(student => (
-                                <div key={student.id} className="student-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        id={`student-${student.id}`}
-                                        checked={selectedStudents.has(student.id)}
-                                        onChange={() => handleStudentSelection(student.id)}
-                                        disabled={loading}
-                                    />
-                                    {/* Use label associated with checkbox for better accessibility */}
-                                    <label htmlFor={`student-${student.id}`} className="student-label">
-                                        {student.name} (ID: {student.id})
-                                    </label>
-                                </div>
-                            ))
-                        ) : (
-                            <p>{error ? 'Error loading students.' : 'Loading students or no students found...'}</p>
+                        <label htmlFor="studentSearchInput">Select Authorized Students:</label>
+                        <input
+                            type="text"
+                            id="studentSearchInput"
+                            value={studentSearchTerm}
+                            onChange={(e) => setStudentSearchTerm(e.target.value)}
+                            placeholder="Buscar estudiantes por nombre o ID..."
+                            disabled={loading}
+                            style={{ marginBottom: '10px', width: 'calc(100% - 18px)', padding: '8px', boxSizing: 'border-box' }}
+                        />
+
+                        {/* Status messages based on loading, error, and student availability */}
+                        {loading && students.length === 0 && !error && <p>Cargando estudiantes...</p>}
+                        {!loading && students.length === 0 && error && <p>Error al cargar la lista de estudiantes. Intente más tarde.</p>}
+                        {!loading && students.length === 0 && !error && <p>No hay estudiantes disponibles para seleccionar.</p>}
+
+                        {/* Display logic when students ARE available */}
+                        {students.length > 0 && (
+                            <>
+                                {!studentSearchTerm && (
+                                    <p>Escriba en la barra de búsqueda para filtrar y seleccionar estudiantes.</p>
+                                )}
+                                {studentSearchTerm && currentFilteredStudents.length > 0 && (
+                                    currentFilteredStudents.map(student => (
+                                        <div key={student.id} className="student-checkbox">
+                                            <input
+                                                type="checkbox"
+                                                id={`student-${student.id}`}
+                                                checked={selectedStudents.has(student.id)}
+                                                onChange={() => handleStudentSelection(student.id)}
+                                                disabled={loading}
+                                            />
+                                            <label htmlFor={`student-${student.id}`} className="student-label">
+                                                {student.name} (ID: {student.id})
+                                            </label>
+                                        </div>
+                                    ))
+                                )}
+                                {studentSearchTerm && currentFilteredStudents.length === 0 && (
+                                    <p>No se encontraron estudiantes que coincidan con "{studentSearchTerm}".</p>
+                                )}
+                            </>
                         )}
                     </div>
 
