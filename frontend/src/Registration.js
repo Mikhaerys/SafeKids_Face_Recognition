@@ -258,40 +258,44 @@ const Registration = () => {
                             onChange={(e) => setStudentSearchTerm(e.target.value)}
                             placeholder="Buscar estudiantes por nombre o ID..."
                             disabled={loading}
-                            style={{ marginBottom: '10px', width: 'calc(100% - 18px)', padding: '8px', boxSizing: 'border-box' }}
+                            className="student-search-input"
                         />
 
                         {/* Status messages based on loading, error, and student availability */}
-                        {loading && students.length === 0 && !error && <p>Cargando estudiantes...</p>}
-                        {!loading && students.length === 0 && error && <p>Error al cargar la lista de estudiantes. Intente más tarde.</p>}
-                        {!loading && students.length === 0 && !error && <p>No hay estudiantes disponibles para seleccionar.</p>}
+                        {loading && students.length === 0 && !error && <p className="info-message">Cargando estudiantes...</p>}
+                        {!loading && students.length === 0 && error && <p className="error-message">Error al cargar la lista de estudiantes. Intente más tarde.</p>}
+                        {!loading && students.length === 0 && !error && <p className="info-message">No hay estudiantes disponibles para seleccionar.</p>}
 
                         {/* Display logic when students ARE available */}
                         {students.length > 0 && (
-                            <>
+                            <div className="students-container">
                                 {!studentSearchTerm && (
-                                    <p>Escriba en la barra de búsqueda para filtrar y seleccionar estudiantes.</p>
+                                    <p className="info-message">Escriba en la barra de búsqueda para filtrar y seleccionar estudiantes.</p>
                                 )}
                                 {studentSearchTerm && currentFilteredStudents.length > 0 && (
-                                    currentFilteredStudents.map(student => (
-                                        <div key={student.id} className="student-checkbox">
-                                            <input
-                                                type="checkbox"
-                                                id={`student-${student.id}`}
-                                                checked={selectedStudents.has(student.id)}
-                                                onChange={() => handleStudentSelection(student.id)}
-                                                disabled={loading}
-                                            />
-                                            <label htmlFor={`student-${student.id}`} className="student-label">
-                                                {student.name} (ID: {student.id})
-                                            </label>
-                                        </div>
-                                    ))
+                                    <div className="students-list">
+                                        {currentFilteredStudents.map(student => (
+                                            <div key={student.id} className="student-item">
+                                                <div className="custom-checkbox">
+                                                    <input
+                                                        type="checkbox"
+                                                        id={`student-${student.id}`}
+                                                        checked={selectedStudents.has(student.id)}
+                                                        onChange={() => handleStudentSelection(student.id)}
+                                                        disabled={loading}
+                                                    />
+                                                    <label htmlFor={`student-${student.id}`} className="student-label">
+                                                        {student.name} <span className="student-id">(ID: {student.id})</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                                 {studentSearchTerm && currentFilteredStudents.length === 0 && (
-                                    <p>No se encontraron estudiantes que coincidan con "{studentSearchTerm}".</p>
+                                    <p className="info-message">No se encontraron estudiantes que coincidan con "{studentSearchTerm}".</p>
                                 )}
-                            </>
+                            </div>
                         )}
                     </div>
 
